@@ -1,6 +1,7 @@
 use std::env;
 use std::fs;
 use std::process;
+use std::error::Error;
 
 fn main() {
     // reading the argument values
@@ -16,11 +17,22 @@ fn main() {
     println!("Searching for {}", config.query);
     println!("In file {}", config.filename);
 
+    // handling error from run function
+    if let Err(e) = run(config) {
+        println!("Application error: {}", e);
+
+        process::exit(1);
+    }
+}
+
+// extracting error from run function
+fn run(config: Config) -> Result<(), Box<dyn Error>> {
     // reading the file
-    let contents = fs::read_to_string(config.filename)
-        .expect("Something went wrong reading the file");
+    let contents = fs::read_to_string(config.filename)?;
 
     println!("With text:\n{}", contents);
+
+    Ok(())
 }
 
 // grouping configuration values
