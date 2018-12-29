@@ -27,11 +27,27 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     // reading the file
     let contents = fs::read_to_string(config.filename)?;
 
+    // using the search function
+    for line in search(&config.query, &contents) {
+        println!("{}", line);
+    }
+
     Ok(())
 }
 
 fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    vec![]
+    // storing matching lines
+    let mut results = Vec::new();
+
+    //iterating through the lines
+    for line in contents.lines() {
+        // searching for query
+        if line.contains(query) {
+            results.push(line); 
+        }
+    }
+
+    results
 }
 
 #[cfg(test)]
