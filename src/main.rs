@@ -11,13 +11,13 @@ fn main() {
     // saving the argument values
     let config = Config::new(&args).unwrap_or_else(|err| {
         // handling error
-        println!("Problem parsing arguments: {}", err);
+        eprintln!("Problem parsing arguments: {}", err);
         process::exit(1);
     });
 
     // handling error from run function
     if let Err(e) = minigrep::run(config) {
-        println!("Application error: {}", e);
+        eprintln!("Application error: {}", e);
 
         process::exit(1);
     }
