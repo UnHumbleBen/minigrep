@@ -11,14 +11,21 @@ pub struct Config {
 
 impl Config {
     // constructor for Config
-    pub fn new(args: &[String]) -> Result<Config, &'static str> {
-        // error message
-        if args.len() < 3 {
-            return Err("not enough arguments");
-        }
+    pub fn new(mut args: env::Args) -> Result<Config, &'static str> {
+        // skip the name of the program
+        args.next();
 
-        let query = args[1].clone();
-        let filename = args[2].clone();
+        // get value for query
+        let query = match args.next() {
+            Some(arg) => arg,
+            None => return Err("didn't get a query string"),
+        };
+ 
+        // get value for filename
+        let filename = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn't get a file name"),
+        };
 
         // check for enviromental variable
         let case_sensitive = env::var("CASE_INSENSITIVE").is_err();
@@ -47,31 +54,20 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 }
 
 fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    // storing matching lines
-    let mut results = Vec::new();
-
-    //iterating through the lines
-    for line in contents.lines() {
-        // searching for query
-        if line.contains(query) {
-            results.push(line); 
-        }
-    }
-
-    results
+    // filtering and collecting lines that contain query
+    contents.lines()
+        .filter(|line| line.contains(query))
+        .collect()
 }
 
 fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    // ignore case for query
     let query = query.to_lowercase();
-    let mut results = Vec::new();
 
-    for line in contents.lines() {
-        if line.to_lowercase().contains(&query) {
-            results.push(line);
-        }
-    }
-
-    results
+    // filter and collect lines that contain query
+    contents.lines()
+        .filter(|line| line.to_lowercase().contains(&query))
+        .collect()
 }
 
 #[cfg(test)]
